@@ -8,28 +8,31 @@ import torch
 from IPython import embed
 
 class JNDDataset(BaseDataset):
-    def initialize(self, dataroot, load_size=64):
-        self.root = dataroot
+    def initialize(self, dataroots, load_size=64):
+        if not isinstance(dataroots, list):
+            dataroots = [dataroots]
+
+        self.roots = dataroots
         self.load_size = load_size
 
-        self.dir_p0 = os.path.join(self.root, 'p0')
+        self.dir_p0 = [os.path.join(root, 'p0') for root in self.roots]
         self.p0_paths = make_dataset(self.dir_p0)
         self.p0_paths = sorted(self.p0_paths)
 
-        self.dir_p1 = os.path.join(self.root, 'p1')
+        self.dir_p1 = [os.path.join(root, 'p1') for root in self.roots]
         self.p1_paths = make_dataset(self.dir_p1)
         self.p1_paths = sorted(self.p1_paths)
 
         transform_list = []
         transform_list.append(transforms.Resize(load_size))
-        transform_list += [transforms.ToTensor(),
-            transforms.Normalize((0.5, 0.5, 0.5),(0.5, 0.5, 0.5))]
-
+        transform_list += [
+            transforms.ToTensor(),
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+        ]
         self.transform = transforms.Compose(transform_list)
 
-        # judgement directory
-        self.dir_S = os.path.join(self.root, 'same')
-        self.same_paths = make_dataset(self.dir_S,mode='np')
+        self.dir_S = [os.path.join(root, 'same') for root in self.roots]
+        self.same_paths = make_dataset(self.dir_S, mode='np')
         self.same_paths = sorted(self.same_paths)
 
     def __getitem__(self, index):

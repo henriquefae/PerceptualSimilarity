@@ -1,3 +1,8 @@
 *.pyc
 
 checkpoints/*
+.venv/
+dataset/
+direct_optimization_results/
+input.png
+target.png
